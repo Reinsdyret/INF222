@@ -35,10 +35,7 @@ eval :: CalcExprAST -> Integer
 eval (Lit a) = a
 eval (Add a b) = (eval a) + (eval b)
 eval (Mult a b) = (eval a) * (eval b)
-eval (Sub a b) = if (a' > b')
-  then a' - b' else ((-1) * (b' - a'))
-  where a' = eval a
-        b' = eval b
+eval (Sub a b) = (eval a) - (eval b)
 eval (Neg a) = (-1) * (eval a)
             
           
