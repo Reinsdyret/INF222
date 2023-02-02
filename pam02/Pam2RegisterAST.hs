@@ -4,7 +4,7 @@
 -- Since 2020-03-14
 
 module Pam2RegisterAST where
-
+import Pam2RegisterStore 
 
 -----------------------
 
@@ -64,3 +64,31 @@ calculatorSetRegisterAST4
   = SetReg Reg1 calculatorRegisterAST4
 
 -----------------------
+
+-- Evaluate a calculator expression given a Store
+evaluate :: CalcExprAST -> Store -> Integer
+evaluate (Reg a) store = getStore store $ getRegisterIndex a
+evaluate (Lit a) store = a
+evaluate (Add a b) store = (evaluate a) + (evaluate b)
+evaluate (Mult a b) store = (evaluate a) * (evaluate b)
+evaluate (Sub a b) store = (evaluate a) - (evaluate b)
+evaluate (Neg a) store = (-1) * a
+
+-- Set the value of a calculator expression to a register in the store
+execute :: CalcStmtAst -> Store -> Store
+execute (SetReg reg stmt) store = setStore (getRegisterIndex reg) (evaluate stmt) store
+
+-- Map a register to an index in the store
+getRegisterIndex :: Register -> Integer
+getRegisterIndex a = case a of
+  Reg0 -> 0
+  Reg1 -> 1
+  Reg2 -> 2
+  Reg3 -> 3
+  Reg4 -> 4
+  Reg5 -> 5
+  Reg6 -> 6
+  Reg7 -> 7
+  Reg8 -> 8
+  Reg9 -> 9
+
