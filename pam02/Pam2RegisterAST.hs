@@ -5,6 +5,8 @@
 
 module Pam2RegisterAST where
 import Pam2RegisterStore 
+import Test.QuickCheck
+import GHC.Data.BooleanFormula (eval)
 
 -----------------------
 
@@ -69,14 +71,14 @@ calculatorSetRegisterAST4
 evaluate :: CalcExprAST -> Store -> Integer
 evaluate (Reg a) store = getStore store $ getRegisterIndex a
 evaluate (Lit a) store = a
-evaluate (Add a b) store = (evaluate a) + (evaluate b)
-evaluate (Mult a b) store = (evaluate a) * (evaluate b)
-evaluate (Sub a b) store = (evaluate a) - (evaluate b)
-evaluate (Neg a) store = (-1) * a
+evaluate (Add a b) store = (evaluate a store) + (evaluate b store)
+evaluate (Mult a b) store = (evaluate a store) * (evaluate b store)
+evaluate (Sub a b) store = (evaluate a store) - (evaluate b store)
+evaluate (Neg a) store = (-1) * (evaluate a store)
 
 -- Set the value of a calculator expression to a register in the store
-execute :: CalcStmtAst -> Store -> Store
-execute (SetReg reg stmt) store = setStore (getRegisterIndex reg) (evaluate stmt) store
+execute :: CalcStmtAST -> Store -> Store
+execute (SetReg reg stmt) store = setStore (getRegisterIndex reg) (evaluate stmt store) store
 
 -- Map a register to an index in the store
 getRegisterIndex :: Register -> Integer
@@ -91,4 +93,21 @@ getRegisterIndex a = case a of
   Reg7 -> 7
   Reg8 -> 8
   Reg9 -> 9
+
+
+-- Tests
+litTest :: Integer -> Bool
+litTest x = evaluate (Lit x) registerStore == x
+
+addTest :: Integer -> Integer -> Bool
+addTest x y = evaluate (Add (Lit x) (Lit y)) registerStore == x + y
+
+
+main :: IO ()
+main = do
+  putStrLn "Testing litTest ..."
+  quickCheck litTest
+
+  putStrLn "Testing addTest ..."
+  quickCheck addTest
 
